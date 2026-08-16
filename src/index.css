@@ -1,0 +1,402 @@
+:root {
+  --text: #444;
+  --text-h: #111;
+  --bg: #fff;
+  --panel-bg: #fafafa;
+  --border: #e2e2e2;
+  --accent: #2f6feb;
+  --accent-h: #1e56c4;
+  --danger: #d9364f;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font: 16px/1.45 var(--sans);
+  color-scheme: light dark;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #c7c7c7;
+    --text-h: #f5f5f5;
+    --bg: #121214;
+    --panel-bg: #1a1a1d;
+    --border: #2c2c30;
+    --accent: #5b8cf0;
+    --accent-h: #7ba1f2;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2 {
+  color: var(--text-h);
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input {
+  font: inherit;
+}
+
+/* ---------- Join screen ---------- */
+
+.join-screen {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.join-screen h1 {
+  font-size: 40px;
+  letter-spacing: -1px;
+}
+
+.tagline {
+  color: var(--text);
+  margin-bottom: 24px;
+}
+
+.join-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.join-tabs button,
+.navbar-toggle button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--text);
+}
+
+.join-tabs button.active,
+.navbar-toggle button.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.join-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-h);
+  text-align: left;
+}
+
+.join-form input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.color-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+}
+
+.color-swatch.selected {
+  border-color: var(--text-h);
+}
+
+button.primary {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+}
+
+button.primary:hover {
+  background: var(--accent-h);
+}
+
+button.primary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+button.secondary {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-bg);
+  color: var(--text-h);
+}
+
+button.primary.stop {
+  background: var(--danger);
+}
+
+.form-error {
+  color: var(--danger);
+  font-size: 14px;
+}
+
+/* ---------- App shell / nav ---------- */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.navbar-title {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  margin-right: auto;
+}
+
+.navbar-title strong {
+  font-size: 18px;
+  color: var(--text-h);
+}
+
+.navbar-group {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.navbar-toggle {
+  display: flex;
+  gap: 6px;
+}
+
+.navbar-toggle button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 12px;
+}
+
+.navbar-links a {
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.navbar-links a.active {
+  background: var(--panel-bg);
+  color: var(--text-h);
+}
+
+/* ---------- Home / map layout ---------- */
+
+.home-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.map-pane {
+  flex: 1;
+  min-height: 50svh;
+}
+
+.side-pane {
+  width: 280px;
+  padding: 16px;
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  background: var(--panel-bg);
+}
+
+.invite-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.invite-card strong {
+  font-family: ui-monospace, Consolas, monospace;
+  letter-spacing: 1px;
+  color: var(--text-h);
+}
+
+@media (max-width: 720px) {
+  .home-body {
+    flex-direction: column;
+  }
+  .side-pane {
+    width: auto;
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+}
+
+/* ---------- Leaderboard ---------- */
+
+.leaderboard {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.leaderboard-rank {
+  width: 20px;
+  font-weight: 700;
+  color: var(--text-h);
+  text-align: center;
+}
+
+.leaderboard-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.leaderboard-name {
+  flex: 1;
+  color: var(--text-h);
+  font-weight: 500;
+}
+
+.leaderboard-area {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.leaderboard-empty {
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* ---------- Activity tracker ---------- */
+
+.activity-map-pane {
+  flex: 1;
+  min-height: 55svh;
+}
+
+.activity-controls {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--panel-bg);
+}
+
+.activity-stats {
+  display: flex;
+  justify-content: space-around;
+}
+
+.activity-stats > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.review-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.claim-summary {
+  text-align: center;
+  color: var(--text-h);
+}
+
+.review-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.review-actions button {
+  flex: 1;
+}
