@@ -292,6 +292,54 @@ button.primary.stop {
   }
 }
 
+/* ---------- Strava connect ---------- */
+
+.strava-card {
+  margin-bottom: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.strava-connect-btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  background: #fc4c02;
+}
+
+.strava-connect-btn:hover {
+  background: #e04502;
+}
+
+.strava-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 14px;
+}
+
+.strava-status button {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.strava-result {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.strava-banner {
+  color: #1a7f37;
+  font-size: 14px;
+  margin: 0;
+}
+
 /* ---------- Leaderboard ---------- */
 
 .leaderboard {
@@ -357,6 +405,12 @@ button.primary.stop {
   flex-direction: column;
   gap: 12px;
   background: var(--panel-bg);
+}
+
+.activity-hint {
+  font-size: 13px;
+  color: var(--text);
+  text-align: center;
 }
 
 .activity-stats {

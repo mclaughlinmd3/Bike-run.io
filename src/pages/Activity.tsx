@@ -94,6 +94,12 @@ export default function Activity() {
       </div>
 
       <div className="activity-controls">
+        {phase === 'idle' && (
+          <p className="activity-hint">
+            Tracking with Strava? Just record there as usual — connect Strava from the map screen and your
+            run or ride will sync in automatically. This screen only tracks while it stays open on screen.
+          </p>
+        )}
         <div className="activity-stats">
           <div>
             <span className="stat-label">Distance</span>

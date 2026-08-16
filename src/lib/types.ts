@@ -12,6 +12,7 @@ export interface Profile {
   name: string;
   color: string;
   group_id: string | null;
+  strava_connected: boolean;
   created_at: string;
 }
 
@@ -31,6 +32,8 @@ export interface Activity {
   gps_track: TrackPoint[];
   distance_m: number;
   duration_s: number;
+  source: 'manual' | 'strava';
+  strava_activity_id: number | null;
   created_at: string;
 }
 

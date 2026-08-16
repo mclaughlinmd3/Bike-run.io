@@ -20,7 +20,21 @@ create table if not exists profiles (
   name text not null,
   color text not null,
   group_id uuid references groups (id) on delete set null,
+  strava_connected boolean not null default false,
   created_at timestamptz not null default now()
+);
+
+-- Strava OAuth tokens. Deliberately has NO RLS policies (RLS is enabled with
+-- zero grants below), so no client role can read or write this table at all
+-- — only the server-side service-role key used by api/strava/*.ts can touch
+-- it. Tokens must never reach the browser.
+create table if not exists strava_connections (
+  profile_id uuid primary key references profiles (id) on delete cascade,
+  strava_athlete_id bigint not null,
+  access_token text not null,
+  refresh_token text not null,
+  expires_at timestamptz not null,
+  updated_at timestamptz not null default now()
 );
 
 do $$ begin
@@ -39,8 +53,13 @@ create table if not exists activities (
   gps_track jsonb not null default '[]'::jsonb,
   distance_m double precision not null default 0,
   duration_s integer not null default 0,
+  source text not null default 'manual' check (source in ('manual', 'strava')),
+  strava_activity_id bigint,
   created_at timestamptz not null default now()
 );
+-- One row per Strava activity, so re-syncing never double-claims territory.
+create unique index if not exists activities_strava_activity_id_uidx
+  on activities (strava_activity_id) where strava_activity_id is not null;
 
 create table if not exists territory_claims (
   id uuid primary key default gen_random_uuid(),
@@ -103,7 +122,10 @@ begin
     raise exception 'activity % not found', p_activity_id;
   end if;
 
-  if v_user_id <> auth.uid() then
+  -- auth.uid() is null for service-role callers (the Strava sync function,
+  -- which has already authenticated the player itself before calling this) —
+  -- only enforce ownership when the call carries a real user JWT.
+  if auth.uid() is not null and v_user_id <> auth.uid() then
     raise exception 'not authorized to claim on behalf of activity %', p_activity_id;
   end if;
 
@@ -154,6 +176,10 @@ alter table profiles enable row level security;
 alter table activities enable row level security;
 alter table territory_claims enable row level security;
 alter table territory_state enable row level security;
+alter table strava_connections enable row level security;
+-- No policies for strava_connections on purpose: RLS with zero grants means
+-- every client-facing role (anon, authenticated) is denied entirely, while
+-- the service-role key (server-side only) still bypasses RLS as usual.
 
 -- groups: any signed-in user can look up a group (invite code is the secret);
 -- only the code itself, not row access, gates who can actually join.
