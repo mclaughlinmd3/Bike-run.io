@@ -1,14 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
-import type { VercelRequest, VercelResponse } from '../_vercel-types';
-import { supabaseAdmin } from '../_supabaseAdmin';
+import type { VercelRequest, VercelResponse } from '../_vercel-types.js';
+import { supabaseAdmin } from '../_supabaseAdmin.js';
 import {
   fetchRecentStravaActivities,
   fetchStravaActivityStreams,
   refreshStravaToken,
   STRAVA_TYPE_MAP,
-} from '../_strava';
-import { detectClaimedPolygons } from '../../src/lib/geometry';
-import type { TrackPoint } from '../../src/lib/types';
+} from '../_strava.js';
+import { detectClaimedPolygons } from '../../src/lib/geometry.js';
+import type { TrackPoint } from '../../src/lib/types.js';
+import { getErrorMessage } from '../../src/lib/errors.js';
 
 // Pulls the caller's recent Strava activities, imports any not already
 // seen (deduped on strava_activity_id), and runs each through the same
@@ -16,6 +17,15 @@ import type { TrackPoint } from '../../src/lib/types';
 // This is what lets Strava's own (reliable, background-capable) GPS
 // recording stand in for our in-browser tracker.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  try {
+    await syncHandler(req, res);
+  } catch (err) {
+    console.error('Strava sync crashed', err);
+    res.status(500).json({ error: getErrorMessage(err) });
+  }
+}
+
+async function syncHandler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     res.status(405).send('Method not allowed');
     return;
