@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Profile } from '../lib/types';
 import { buildStravaAuthorizeUrl, isStravaConfigured, syncStrava, type StravaSyncResult } from '../lib/strava';
+import { getErrorMessage } from '../lib/errors';
 
 interface StravaConnectProps {
   profile: Profile;
@@ -19,7 +20,7 @@ export default function StravaConnect({ profile }: StravaConnectProps) {
       const result = await syncStrava();
       setLastResult(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError(getErrorMessage(err));
     } finally {
       setSyncing(false);
     }

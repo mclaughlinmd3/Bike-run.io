@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { getErrorMessage } from '../lib/errors';
 import type { ActivityType, Profile, TerritoryStateRow } from '../lib/types';
 import type { Feature, Polygon } from 'geojson';
 
@@ -45,7 +46,7 @@ export const useTerritoryStore = create<TerritoryState>((set, get) => ({
 
       set({ rows: rows ?? [], profiles: profileMap, loading: false });
     } catch (err) {
-      set({ loading: false, error: err instanceof Error ? err.message : String(err) });
+      set({ loading: false, error: getErrorMessage(err) });
       return;
     }
 

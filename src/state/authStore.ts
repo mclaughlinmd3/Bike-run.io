@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
+import { getErrorMessage } from '../lib/errors';
 import type { Group, Profile } from '../lib/types';
 
 function generateInviteCode(): string {
@@ -60,7 +61,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       set({ loading: false, profile, group: group ?? null });
     } catch (err) {
-      set({ loading: false, error: err instanceof Error ? err.message : String(err) });
+      set({ loading: false, error: getErrorMessage(err) });
     }
   },
 
@@ -87,7 +88,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       set({ loading: false, profile, group });
     } catch (err) {
-      set({ loading: false, error: err instanceof Error ? err.message : String(err) });
+      set({ loading: false, error: getErrorMessage(err) });
     }
   },
 
@@ -115,7 +116,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
       set({ loading: false, profile, group });
     } catch (err) {
-      set({ loading: false, error: err instanceof Error ? err.message : String(err) });
+      set({ loading: false, error: getErrorMessage(err) });
     }
   },
 

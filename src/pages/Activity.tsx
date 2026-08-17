@@ -6,6 +6,7 @@ import { useTerritoryStore } from '../state/territoryStore';
 import { useGpsTracker } from '../lib/useGpsTracker';
 import { detectClaimedPolygons, squareMetersToKm2 } from '../lib/geometry';
 import { supabase } from '../lib/supabase';
+import { getErrorMessage } from '../lib/errors';
 import MapView from '../components/MapView';
 import * as turf from '@turf/turf';
 
@@ -77,7 +78,7 @@ export default function Activity() {
       }
       navigate('/');
     } catch (err) {
-      setSaveError(err instanceof Error ? err.message : String(err));
+      setSaveError(getErrorMessage(err));
       setPhase('reviewing');
     }
   };
