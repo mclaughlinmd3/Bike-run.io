@@ -32,8 +32,12 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
+  /* Stops iOS Safari's pull-to-refresh/rubber-band bounce from fighting
+     with map drag gestures. */
+  overscroll-behavior: none;
 }
 
 #root {
@@ -49,13 +53,18 @@ h2 {
   margin: 0 0 8px;
 }
 
-button {
+button,
+a {
   font: inherit;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 input {
   font: inherit;
+  /* Keep >=16px so iOS Safari doesn't auto-zoom the page on focus. */
+  font-size: max(16px, 1em);
 }
 
 /* ---------- Join screen ---------- */
@@ -133,8 +142,8 @@ input {
 }
 
 .color-swatch {
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 2px solid transparent;
   padding: 0;
@@ -191,7 +200,7 @@ button.primary.stop {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 16px;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
@@ -399,7 +408,7 @@ button.primary.stop {
 }
 
 .activity-controls {
-  padding: 16px;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
