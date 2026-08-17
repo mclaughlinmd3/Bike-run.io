@@ -171,6 +171,24 @@ $$;
 -- Row Level Security
 -- ---------------------------------------------------------------------------
 
+-- A policy on `profiles` can't query `profiles` in its own USING clause —
+-- Postgres re-applies the same policy to that inner query and recurses
+-- forever ("infinite recursion detected in policy for relation profiles").
+-- Routing the lookup through a SECURITY DEFINER function sidesteps this: the
+-- function runs as its (table-owning) creator, which bypasses RLS entirely,
+-- so the inner lookup never re-triggers the policy. Every policy below that
+-- needs "is this row in my group" reuses this instead of a raw subquery on
+-- profiles.
+create or replace function current_profile_group_id()
+returns uuid
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select group_id from profiles where id = auth.uid()
+$$;
+
 alter table groups enable row level security;
 alter table profiles enable row level security;
 alter table activities enable row level security;
@@ -181,6 +199,11 @@ alter table strava_connections enable row level security;
 -- every client-facing role (anon, authenticated) is denied entirely, while
 -- the service-role key (server-side only) still bypasses RLS as usual.
 
+-- Policies are dropped and recreated so this file is safe to re-run on a
+-- database that already has an earlier version of them.
+
+drop policy if exists "groups are readable by signed-in users" on groups;
+drop policy if exists "signed-in users can create a group" on groups;
 -- groups: any signed-in user can look up a group (invite code is the secret);
 -- only the code itself, not row access, gates who can actually join.
 create policy "groups are readable by signed-in users" on groups
@@ -188,37 +211,38 @@ create policy "groups are readable by signed-in users" on groups
 create policy "signed-in users can create a group" on groups
   for insert with check (auth.uid() is not null);
 
+drop policy if exists "profiles are readable within the same group" on profiles;
+drop policy if exists "users manage their own profile" on profiles;
+drop policy if exists "users update their own profile" on profiles;
 create policy "profiles are readable within the same group" on profiles
   for select using (
     id = auth.uid()
-    or group_id in (select group_id from profiles where id = auth.uid())
+    or group_id = current_profile_group_id()
   );
 create policy "users manage their own profile" on profiles
   for insert with check (id = auth.uid());
 create policy "users update their own profile" on profiles
   for update using (id = auth.uid());
 
+drop policy if exists "activities readable within group" on activities;
+drop policy if exists "users insert their own activities" on activities;
+drop policy if exists "users update their own activities" on activities;
 create policy "activities readable within group" on activities
-  for select using (
-    group_id in (select group_id from profiles where id = auth.uid())
-  );
+  for select using (group_id = current_profile_group_id());
 create policy "users insert their own activities" on activities
   for insert with check (
-    user_id = auth.uid()
-    and group_id in (select group_id from profiles where id = auth.uid())
+    user_id = auth.uid() and group_id = current_profile_group_id()
   );
 create policy "users update their own activities" on activities
   for update using (user_id = auth.uid());
 
+drop policy if exists "claims readable within group" on territory_claims;
 create policy "claims readable within group" on territory_claims
-  for select using (
-    group_id in (select group_id from profiles where id = auth.uid())
-  );
+  for select using (group_id = current_profile_group_id());
 
+drop policy if exists "territory readable within group" on territory_state;
 create policy "territory readable within group" on territory_state
-  for select using (
-    group_id in (select group_id from profiles where id = auth.uid())
-  );
+  for select using (group_id = current_profile_group_id());
 
 -- ---------------------------------------------------------------------------
 -- Realtime: broadcast changes so every group member's map updates live.
